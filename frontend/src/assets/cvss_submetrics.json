@@ -1,0 +1,1037 @@
+{
+  "metrics": {
+    "AV": {
+      "metric": "AV",
+      "name": "Attack Vector",
+      "description": "Riflette il contesto in cui è possibile lo sfruttamento della vulnerabilità.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "Network",
+          "description": "Raggiungibile da remoto via rete.",
+          "submetrics": [
+            {
+              "id": "AV_N_PUBLIC_INTERNET",
+              "metric": "AV",
+              "cvss_value": "N",
+              "label": "Public Internet-Facing",
+              "description": "Esposto direttamente su indirizzi IP/FQDN pubblici senza protezioni di rete perimetrali."
+            },
+            {
+              "id": "AV_N_BACKBONE_TRANSIT",
+              "metric": "AV",
+              "cvss_value": "N",
+              "label": "ISP Backbone / Carrier Transit",
+              "description": "Infrastruttura di routing core/transito ISP o peering pubblico (BGP, router perimetrali di transito)."
+            },
+            {
+              "id": "AV_N_INTERNAL_LAN",
+              "metric": "AV",
+              "cvss_value": "N",
+              "label": "Internal Routable LAN",
+              "description": "Rete interna aziendale o subnet di datacenter raggiungibile da altri segmenti interni tramite normale routing L3."
+            }
+          ]
+        },
+        "A": {
+          "cvss_value": "A",
+          "name": "Adjacent",
+          "description": "Richiede prossimità di rete fisica o logica.",
+          "submetrics": [
+            {
+              "id": "AV_A_VPN_GATEWAY",
+              "metric": "AV",
+              "cvss_value": "A",
+              "label": "Corporate VPN / Tunnel Gateway",
+              "description": "Accesso condizionato all'autenticazione preventiva a una VPN aziendale (client-to-site o concentratore remoto)."
+            },
+            {
+              "id": "AV_A_B2B_MPLS",
+              "metric": "AV",
+              "cvss_value": "A",
+              "label": "Intercompany Peering / B2B MPLS",
+              "description": "Connessioni dedicate chiuse verso partner terzi, fornitori o filiali (circuiti MPLS privati, cross-connect)."
+            },
+            {
+              "id": "AV_A_L2_BROADCAST",
+              "metric": "AV",
+              "cvss_value": "A",
+              "label": "Same L2 Broadcast Domain",
+              "description": "Richiede presenza sullo stesso switch, VLAN o dominio di broadcast locale (ARP spoofing, LLMNR, mDNS)."
+            },
+            {
+              "id": "AV_A_WIRELESS_RADIO",
+              "metric": "AV",
+              "cvss_value": "A",
+              "label": "Wireless / Radio Proximity",
+              "description": "Richiede raggio d'azione radio diretto (Wi-Fi Corporate/Guest, Bluetooth, BLE, Zigbee, RFID)."
+            }
+          ]
+        },
+        "L": {
+          "cvss_value": "L",
+          "name": "Local",
+          "description": "Richiede accesso locale al sistema o interazione con file locale.",
+          "submetrics": [
+            {
+              "id": "AV_L_SHELL_ACCESS",
+              "metric": "AV",
+              "cvss_value": "L",
+              "label": "Interactive Shell Access",
+              "description": "Richiede una sessione di login locale/remota già attiva sul target (SSH, RDP, terminale interattivo)."
+            },
+            {
+              "id": "AV_L_DESKTOP_CLIENT",
+              "metric": "AV",
+              "cvss_value": "L",
+              "label": "Desktop / Endpoint Client",
+              "description": "Vulnerabilità in software desktop/CLI che richiede l'apertura o l'invocazione locale da parte dell'operatore."
+            }
+          ]
+        },
+        "P": {
+          "cvss_value": "P",
+          "name": "Physical",
+          "description": "Richiede contatto fisico diretto o accesso alle porte dell'hardware.",
+          "submetrics": [
+            {
+              "id": "AV_P_HARDWARE_CONSOLE",
+              "metric": "AV",
+              "cvss_value": "P",
+              "label": "Hardware Interface / Console",
+              "description": "Accesso tramite porte fisiche dirette (USB, JTAG, Thunderbolt) o console rack/laptop incustodito."
+            }
+          ]
+        }
+      }
+    },
+    "AC": {
+      "metric": "AC",
+      "name": "Attack Complexity",
+      "description": "Descrive le condizioni al di fuori del controllo dell'attaccante necessarie per sfruttare la vulnerabilità.",
+      "values": {
+        "L": {
+          "cvss_value": "L",
+          "name": "Low",
+          "description": "Nessuna condizione particolare richiesta, attacco ripetibile e prevedibile.",
+          "submetrics": [
+            {
+              "id": "AC_L_NO_EXPERIENCE",
+              "metric": "AC",
+              "cvss_value": "L",
+              "label": "No Technical Experience Needed",
+              "description": "Exploit '1-click' o zero interazione tecnica; automatismi reperibili pubblicamente, interfacce web point-and-click."
+            },
+            {
+              "id": "AC_L_COMMODITY_TOOLING",
+              "metric": "AC",
+              "cvss_value": "L",
+              "label": "Script Kiddie / Commodity Tooling",
+              "description": "Utilizzo di moduli Metasploit precompilati, script Python pronti su GitHub, scanner automatizzati con payload integrati."
+            }
+          ]
+        },
+        "H": {
+          "cvss_value": "H",
+          "name": "High",
+          "description": "Richiede condizioni specifiche o competenze avanzate di evasione e ingegneria.",
+          "submetrics": [
+            {
+              "id": "AC_H_EXPERT_DEVELOPER",
+              "metric": "AC",
+              "cvss_value": "H",
+              "label": "Senior Exploit Developer / Expert",
+              "description": "Richiede scrittura di shellcode personalizzato, reverse-engineering del binario, bypass di protezioni (ASLR, DEP/W^X) o race condition temporali strette."
+            },
+            {
+              "id": "AC_H_NATION_STATE_APT",
+              "metric": "AC",
+              "cvss_value": "H",
+              "label": "Nation-State / APT / Tier-1 Actor",
+              "description": "Richiede catene multi-exploit (chain 0-day), risorse computazionali estese per attacchi crittografici, bypass di protezioni hardware proprietarie o posizionamento su dorsali statali."
+            }
+          ]
+        }
+      }
+    },
+    "PR": {
+      "metric": "PR",
+      "name": "Privileges Required",
+      "description": "Descrive il livello di privilegi che l'attaccante deve possedere prima di sfruttare la vulnerabilità.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "None",
+          "description": "Non richiede privilegi né autenticazione pregressa.",
+          "submetrics": [
+            {
+              "id": "PR_N_ANONYMOUS",
+              "metric": "PR",
+              "cvss_value": "N",
+              "label": "Anonymous / Public User",
+              "description": "Nessuna autenticazione necessaria; sfruttabile da chiunque raggiunga l'endpoint."
+            }
+          ]
+        },
+        "L": {
+          "cvss_value": "L",
+          "name": "Low",
+          "description": "Richiede privilegi standard di utente base o account applicativo con scopi limitati.",
+          "submetrics": [
+            {
+              "id": "PR_L_STANDARD_USER",
+              "metric": "PR",
+              "cvss_value": "L",
+              "label": "Standard End-User / Customer",
+              "description": "Richiede credenziali base (es. utente registrato su un portale e-commerce, account AD standard senza diritti admin)."
+            },
+            {
+              "id": "PR_L_SERVICE_ACCOUNT",
+              "metric": "PR",
+              "cvss_value": "L",
+              "label": "Service Account / Low Scope",
+              "description": "Credenziali di un microservizio o API key con permessi minimi di sola lettura o funzioni limitate."
+            }
+          ]
+        },
+        "H": {
+          "cvss_value": "H",
+          "name": "High",
+          "description": "Richiede privilegi significativi di controllo amministrativo o di sistema.",
+          "submetrics": [
+            {
+              "id": "PR_H_DOMAIN_ADMIN",
+              "metric": "PR",
+              "cvss_value": "H",
+              "label": "Domain / Enterprise Admin",
+              "description": "Richiede privilegi massimi sull'infrastruttura (Domain Admin in Active Directory, root su Linux, Cloud IAM Global Admin)."
+            },
+            {
+              "id": "PR_H_APP_DBA",
+              "metric": "PR",
+              "cvss_value": "H",
+              "label": "Application / Database DBA",
+              "description": "Privilegi amministrativi confinati alla singola applicazione o al database di backend."
+            }
+          ]
+        }
+      }
+    },
+    "UI": {
+      "metric": "UI",
+      "name": "User Interaction",
+      "description": "Verifica se è richiesta l'interazione di un utente diverso dall'attaccante.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "None",
+          "description": "Sfruttabile senza alcuna interazione dell'utente.",
+          "submetrics": [
+            {
+              "id": "UI_N_ZERO_CLICK",
+              "metric": "UI",
+              "cvss_value": "N",
+              "label": "Zero-Click / Autonomous",
+              "description": "Sfruttabile automaticamente all'arrivo del payload (demoni di rete, wormable)."
+            }
+          ]
+        },
+        "R": {
+          "cvss_value": "R",
+          "name": "Required",
+          "description": "Richiede che un utente compia un'azione specifica per concretizzare l'attacco.",
+          "submetrics": [
+            {
+              "id": "UI_R_LINK_CLICK",
+              "metric": "UI",
+              "cvss_value": "R",
+              "label": "1-Click Phishing / Link Click",
+              "description": "La vittima deve cliccare su un link malevolo, visitare una pagina specifica o autorizzare un prompt (es. OAuth consent)."
+            },
+            {
+              "id": "UI_R_FILE_DOWNLOAD_EXEC",
+              "metric": "UI",
+              "cvss_value": "R",
+              "label": "File Download & Execution",
+              "description": "La vittima deve scaricare e aprire manualmente un file (es. macro Office, archivio malevolo, installer ingannevole)."
+            }
+          ]
+        }
+      }
+    },
+    "S": {
+      "metric": "S",
+      "name": "Scope",
+      "description": "Evidenzia se l'impatto si estende oltre il confine di sicurezza del componente vulnerabile.",
+      "values": {
+        "U": {
+          "cvss_value": "U",
+          "name": "Unchanged",
+          "description": "L'impatto resta confinato al componente vulnerabile originale.",
+          "submetrics": [
+            {
+              "id": "S_U_APP_SANDBOX",
+              "metric": "S",
+              "cvss_value": "U",
+              "label": "Strict Application Sandbox",
+              "description": "L'attacco è isolato nel runtime applicativo (es. un DoS che crasha solo il thread dell'app o SQLi confinata a un DB dedicato)."
+            },
+            {
+              "id": "S_U_INTRA_SERVICE",
+              "metric": "S",
+              "cvss_value": "U",
+              "label": "Intra-Service / Local Isolation",
+              "description": "L'impatto non scavalca il set di permessi del processo vulnerabile né coinvolge altri tenant/sistemi."
+            },
+            {
+              "id": "S_U_CONTAINED_COMPONENT",
+              "metric": "S",
+              "cvss_value": "U",
+              "label": "Contained in Component",
+              "description": "L'impatto resta confinato al runtime dell'applicazione o all'istanza vulnerabile (es. SQLi che impatta solo il DB dell'app)."
+            }
+          ]
+        },
+        "C": {
+          "cvss_value": "C",
+          "name": "Changed",
+          "description": "L'impatto travalica l'autorità di sicurezza del componente vulnerabile impattando altre risorse.",
+          "submetrics": [
+            {
+              "id": "S_C_APP_TO_HOST_RCE",
+              "metric": "S",
+              "cvss_value": "C",
+              "label": "App-to-Host RCE (Breakout)",
+              "description": "Vulnerabilità applicativa (es. deserialization/command injection) che fornisce un accesso a riga di comando sull'OS host, scavalcando la sandbox applicativa."
+            },
+            {
+              "id": "S_C_CONTAINER_VM_ESCAPE",
+              "metric": "S",
+              "cvss_value": "C",
+              "label": "Container / VM Escape",
+              "description": "Fuga dal container Docker/K8s verso l'host node, o da VM guest verso l'hypervisor (KVM/ESXi)."
+            },
+            {
+              "id": "S_C_CLOUD_IAM_PIVOT",
+              "metric": "S",
+              "cvss_value": "C",
+              "label": "Cross-Tenant Cloud / IAM Pivot",
+              "description": "Sfruttamento dell'asset per rubare token temporanei (es. SSRF verso IMDSv1/v2) ed eseguire chiamate API autorizzate sul control plane Cloud."
+            },
+            {
+              "id": "S_C_CROSS_USER_XSS",
+              "metric": "S",
+              "cvss_value": "C",
+              "label": "Cross-User Session (Stored XSS)",
+              "description": "Codice iniettato nell'applicazione che viene eseguito nel contesto di sicurezza del browser di altri utenti ignari."
+            }
+          ]
+        }
+      }
+    },
+    "C": {
+      "metric": "C",
+      "name": "Confidentiality",
+      "description": "Misura l'impatto sulla riservatezza delle informazioni gestite dall'asset.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "None",
+          "description": "Nessun impatto sulla confidenzialità dei dati.",
+          "submetrics": [
+            {
+              "id": "C_N_NO_DISCLOSURE",
+              "metric": "C",
+              "cvss_value": "N",
+              "label": "No Data Disclosure",
+              "description": "Nessuna perdita di riservatezza."
+            }
+          ]
+        },
+        "L": {
+          "cvss_value": "L",
+          "name": "Low",
+          "description": "Accesso a dati confidenziali limitati o metadati di sistema.",
+          "submetrics": [
+            {
+              "id": "C_L_SYSTEM_METADATA",
+              "metric": "C",
+              "cvss_value": "L",
+              "label": "System Metadata / Error Leaks",
+              "description": "Esposizione di versioni software, stack trace, percorsi interni o enumerazione di username."
+            }
+          ]
+        },
+        "H": {
+          "cvss_value": "H",
+          "name": "High",
+          "description": "Compromissione totale o di informazioni altamente sensibili.",
+          "submetrics": [
+            {
+              "id": "C_H_PII_BUSINESS_DATA",
+              "metric": "C",
+              "cvss_value": "H",
+              "label": "PII / Sensitive Business Data",
+              "description": "Esfiltrazione di dati personali (GDPR), carte di pagamento (PCI-DSS), segreti industriali o sorgenti core."
+            },
+            {
+              "id": "C_H_CRYPTO_SECRETS",
+              "metric": "C",
+              "cvss_value": "H",
+              "label": "Critical Cryptographic Secrets",
+              "description": "Compromissione di chiavi private TLS, token di firma JWT, credenziali di accesso master."
+            }
+          ]
+        }
+      }
+    },
+    "I": {
+      "metric": "I",
+      "name": "Integrity",
+      "description": "Misura l'impatto sull'accuratezza e completezza delle informazioni o del sistema.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "None",
+          "description": "Nessuna alterazione possibile dei dati o configurazioni.",
+          "submetrics": [
+            {
+              "id": "I_N_NO_MODIFICATION",
+              "metric": "I",
+              "cvss_value": "N",
+              "label": "No Modification",
+              "description": "I dati e i file di sistema non possono essere alterati."
+            }
+          ]
+        },
+        "L": {
+          "cvss_value": "L",
+          "name": "Low",
+          "description": "Modifica limitata di dati non critici o aspetti estetici.",
+          "submetrics": [
+            {
+              "id": "I_L_NON_CRITICAL_DATA",
+              "metric": "I",
+              "cvss_value": "L",
+              "label": "Non-Critical Data Alteration",
+              "description": "Modifica di preferenze utente, commenti, log superficiali o defacement cosmetico non strutturale."
+            }
+          ]
+        },
+        "H": {
+          "cvss_value": "H",
+          "name": "High",
+          "description": "Modifica arbitraria o totale di codice, file di sistema o database primari.",
+          "submetrics": [
+            {
+              "id": "I_H_ARBITRARY_CODE_EXECUTION",
+              "metric": "I",
+              "cvss_value": "H",
+              "label": "Arbitrary Code Execution (RCE)",
+              "description": "Capacità di scrivere file arbitrari, alterare binari di sistema, installare backdoor o modificare record di database transazionali."
+            }
+          ]
+        }
+      }
+    },
+    "A": {
+      "metric": "A",
+      "name": "Availability",
+      "description": "Misura l'impatto sull'accessibilità o fruibilità dell'asset o servizio.",
+      "values": {
+        "N": {
+          "cvss_value": "N",
+          "name": "None",
+          "description": "Nessun impatto sulle prestazioni o sulla disponibilità del servizio.",
+          "submetrics": [
+            {
+              "id": "A_N_NO_IMPACT",
+              "metric": "A",
+              "cvss_value": "N",
+              "label": "No Impact",
+              "description": "La disponibilità e i tempi di risposta non subiscono variazioni."
+            }
+          ]
+        },
+        "L": {
+          "cvss_value": "L",
+          "name": "Low",
+          "description": "Prestazioni degradate o blocco isolato senza fermo del servizio principale.",
+          "submetrics": [
+            {
+              "id": "A_L_DEGRADED_PERFORMANCE",
+              "metric": "A",
+              "cvss_value": "L",
+              "label": "Degraded Performance / Thread Hang",
+              "description": "Rallentamenti delle risposte, consumo elevato di CPU per singolo processo senza blocco del servizio globale."
+            }
+          ]
+        },
+        "H": {
+          "cvss_value": "H",
+          "name": "High",
+          "description": "Interruzione totale del servizio o collasso infrastrutturale.",
+          "submetrics": [
+            {
+              "id": "A_H_FULL_SYSTEM_CRASH",
+              "metric": "A",
+              "cvss_value": "H",
+              "label": "Full System Crash / Outage",
+              "description": "Kernel panic, esaurimento totale delle risorse, cancellazione di dischi/storage o disservizio totale del servizio critico."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "flat_submetrics": [
+    {
+      "id": "AV_N_PUBLIC_INTERNET",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "Public Internet-Facing",
+      "description": "Esposto direttamente su indirizzi IP/FQDN pubblici senza protezioni di rete perimetrali."
+    },
+    {
+      "id": "AV_N_BACKBONE_TRANSIT",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "ISP Backbone / Carrier Transit",
+      "description": "Infrastruttura di routing core/transito ISP o peering pubblico (BGP, router perimetrali di transito)."
+    },
+    {
+      "id": "AV_N_INTERNAL_LAN",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "Internal Routable LAN",
+      "description": "Rete interna aziendale o subnet di datacenter raggiungibile da altri segmenti interni tramite normale routing L3."
+    },
+    {
+      "id": "AV_A_VPN_GATEWAY",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Corporate VPN / Tunnel Gateway",
+      "description": "Accesso condizionato all'autenticazione preventiva a una VPN aziendale (client-to-site o concentratore remoto)."
+    },
+    {
+      "id": "AV_A_B2B_MPLS",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Intercompany Peering / B2B MPLS",
+      "description": "Connessioni dedicate chiuse verso partner terzi, fornitori o filiali (circuiti MPLS privati, cross-connect)."
+    },
+    {
+      "id": "AV_A_L2_BROADCAST",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Same L2 Broadcast Domain",
+      "description": "Richiede presenza sullo stesso switch, VLAN o dominio di broadcast locale (ARP spoofing, LLMNR, mDNS)."
+    },
+    {
+      "id": "AV_A_WIRELESS_RADIO",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Wireless / Radio Proximity",
+      "description": "Richiede raggio d'azione radio diretto (Wi-Fi Corporate/Guest, Bluetooth, BLE, Zigbee, RFID)."
+    },
+    {
+      "id": "AV_L_SHELL_ACCESS",
+      "metric": "AV",
+      "cvss_value": "L",
+      "label": "Interactive Shell Access",
+      "description": "Richiede una sessione di login locale/remota già attiva sul target (SSH, RDP, terminale interattivo)."
+    },
+    {
+      "id": "AV_L_DESKTOP_CLIENT",
+      "metric": "AV",
+      "cvss_value": "L",
+      "label": "Desktop / Endpoint Client",
+      "description": "Vulnerabilità in software desktop/CLI che richiede l'apertura o l'invocazione locale da parte dell'operatore."
+    },
+    {
+      "id": "AV_P_HARDWARE_CONSOLE",
+      "metric": "AV",
+      "cvss_value": "P",
+      "label": "Hardware Interface / Console",
+      "description": "Accesso tramite porte fisiche dirette (USB, JTAG, Thunderbolt) o console rack/laptop incustodito."
+    },
+    {
+      "id": "AC_L_NO_EXPERIENCE",
+      "metric": "AC",
+      "cvss_value": "L",
+      "label": "No Technical Experience Needed",
+      "description": "Exploit '1-click' o zero interazione tecnica; automatismi reperibili pubblicamente, interfacce web point-and-click."
+    },
+    {
+      "id": "AC_L_COMMODITY_TOOLING",
+      "metric": "AC",
+      "cvss_value": "L",
+      "label": "Script Kiddie / Commodity Tooling",
+      "description": "Utilizzo di moduli Metasploit precompilati, script Python pronti su GitHub, scanner automatizzati con payload integrati."
+    },
+    {
+      "id": "AC_H_EXPERT_DEVELOPER",
+      "metric": "AC",
+      "cvss_value": "H",
+      "label": "Senior Exploit Developer / Expert",
+      "description": "Richiede scrittura di shellcode personalizzato, reverse-engineering del binario, bypass di protezioni (ASLR, DEP/W^X) o race condition temporali strette."
+    },
+    {
+      "id": "AC_H_NATION_STATE_APT",
+      "metric": "AC",
+      "cvss_value": "H",
+      "label": "Nation-State / APT / Tier-1 Actor",
+      "description": "Richiede catene multi-exploit (chain 0-day), risorse computazionali estese per attacchi crittografici, bypass di protezioni hardware proprietarie o posizionamento su dorsali statali."
+    },
+    {
+      "id": "PR_N_ANONYMOUS",
+      "metric": "PR",
+      "cvss_value": "N",
+      "label": "Anonymous / Public User",
+      "description": "Nessuna autenticazione necessaria; sfruttabile da chiunque raggiunga l'endpoint."
+    },
+    {
+      "id": "PR_L_STANDARD_USER",
+      "metric": "PR",
+      "cvss_value": "L",
+      "label": "Standard End-User / Customer",
+      "description": "Richiede credenziali base (es. utente registrato su un portale e-commerce, account AD standard senza diritti admin)."
+    },
+    {
+      "id": "PR_L_SERVICE_ACCOUNT",
+      "metric": "PR",
+      "cvss_value": "L",
+      "label": "Service Account / Low Scope",
+      "description": "Credenziali di un microservizio o API key con permessi minimi di sola lettura o funzioni limitate."
+    },
+    {
+      "id": "PR_H_DOMAIN_ADMIN",
+      "metric": "PR",
+      "cvss_value": "H",
+      "label": "Domain / Enterprise Admin",
+      "description": "Richiede privilegi massimi sull'infrastruttura (Domain Admin in Active Directory, root su Linux, Cloud IAM Global Admin)."
+    },
+    {
+      "id": "PR_H_APP_DBA",
+      "metric": "PR",
+      "cvss_value": "H",
+      "label": "Application / Database DBA",
+      "description": "Privilegi amministrativi confinati alla singola applicazione o al database di backend."
+    },
+    {
+      "id": "UI_N_ZERO_CLICK",
+      "metric": "UI",
+      "cvss_value": "N",
+      "label": "Zero-Click / Autonomous",
+      "description": "Sfruttabile automaticamente all'arrivo del payload (demoni di rete, wormable)."
+    },
+    {
+      "id": "UI_R_LINK_CLICK",
+      "metric": "UI",
+      "cvss_value": "R",
+      "label": "1-Click Phishing / Link Click",
+      "description": "La vittima deve cliccare su un link malevolo, visitare una pagina specifica o autorizzare un prompt (es. OAuth consent)."
+    },
+    {
+      "id": "UI_R_FILE_DOWNLOAD_EXEC",
+      "metric": "UI",
+      "cvss_value": "R",
+      "label": "File Download & Execution",
+      "description": "La vittima deve scaricare e aprire manualmente un file (es. macro Office, archivio malevolo, installer ingannevole)."
+    },
+    {
+      "id": "S_U_APP_SANDBOX",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Strict Application Sandbox",
+      "description": "L'attacco è isolato nel runtime applicativo (es. un DoS che crasha solo il thread dell'app o SQLi confinata a un DB dedicato)."
+    },
+    {
+      "id": "S_U_INTRA_SERVICE",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Intra-Service / Local Isolation",
+      "description": "L'impatto non scavalca il set di permessi del processo vulnerabile né coinvolge altri tenant/sistemi."
+    },
+    {
+      "id": "S_U_CONTAINED_COMPONENT",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Contained in Component",
+      "description": "L'impatto resta confinato al runtime dell'applicazione o all'istanza vulnerabile (es. SQLi che impatta solo il DB dell'app)."
+    },
+    {
+      "id": "S_C_APP_TO_HOST_RCE",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "App-to-Host RCE (Breakout)",
+      "description": "Vulnerabilità applicativa (es. deserialization/command injection) che fornisce un accesso a riga di comando sull'OS host, scavalcando la sandbox applicativa."
+    },
+    {
+      "id": "S_C_CONTAINER_VM_ESCAPE",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Container / VM Escape",
+      "description": "Fuga dal container Docker/K8s verso l'host node, o da VM guest verso l'hypervisor (KVM/ESXi)."
+    },
+    {
+      "id": "S_C_CLOUD_IAM_PIVOT",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Cross-Tenant Cloud / IAM Pivot",
+      "description": "Sfruttamento dell'asset per rubare token temporanei (es. SSRF verso IMDSv1/v2) ed eseguire chiamate API autorizzate sul control plane Cloud."
+    },
+    {
+      "id": "S_C_CROSS_USER_XSS",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Cross-User Session (Stored XSS)",
+      "description": "Codice iniettato nell'applicazione che viene eseguito nel contesto di sicurezza del browser di altri utenti ignari."
+    },
+    {
+      "id": "C_N_NO_DISCLOSURE",
+      "metric": "C",
+      "cvss_value": "N",
+      "label": "No Data Disclosure",
+      "description": "Nessuna perdita di riservatezza."
+    },
+    {
+      "id": "C_L_SYSTEM_METADATA",
+      "metric": "C",
+      "cvss_value": "L",
+      "label": "System Metadata / Error Leaks",
+      "description": "Esposizione di versioni software, stack trace, percorsi interni o enumerazione di username."
+    },
+    {
+      "id": "C_H_PII_BUSINESS_DATA",
+      "metric": "C",
+      "cvss_value": "H",
+      "label": "PII / Sensitive Business Data",
+      "description": "Esfiltrazione di dati personali (GDPR), carte di pagamento (PCI-DSS), segreti industriali o sorgenti core."
+    },
+    {
+      "id": "C_H_CRYPTO_SECRETS",
+      "metric": "C",
+      "cvss_value": "H",
+      "label": "Critical Cryptographic Secrets",
+      "description": "Compromissione di chiavi private TLS, token di firma JWT, credenziali di accesso master."
+    },
+    {
+      "id": "I_N_NO_MODIFICATION",
+      "metric": "I",
+      "cvss_value": "N",
+      "label": "No Modification",
+      "description": "I dati e i file di sistema non possono essere alterati."
+    },
+    {
+      "id": "I_L_NON_CRITICAL_DATA",
+      "metric": "I",
+      "cvss_value": "L",
+      "label": "Non-Critical Data Alteration",
+      "description": "Modifica di preferenze utente, commenti, log superficiali o defacement cosmetico non strutturale."
+    },
+    {
+      "id": "I_H_ARBITRARY_CODE_EXECUTION",
+      "metric": "I",
+      "cvss_value": "H",
+      "label": "Arbitrary Code Execution (RCE)",
+      "description": "Capacità di scrivere file arbitrari, alterare binari di sistema, installare backdoor o modificare record di database transazionali."
+    },
+    {
+      "id": "A_N_NO_IMPACT",
+      "metric": "A",
+      "cvss_value": "N",
+      "label": "No Impact",
+      "description": "La disponibilità e i tempi di risposta non subiscono variazioni."
+    },
+    {
+      "id": "A_L_DEGRADED_PERFORMANCE",
+      "metric": "A",
+      "cvss_value": "L",
+      "label": "Degraded Performance / Thread Hang",
+      "description": "Rallentamenti delle risposte, consumo elevato di CPU per singolo processo senza blocco del servizio globale."
+    },
+    {
+      "id": "A_H_FULL_SYSTEM_CRASH",
+      "metric": "A",
+      "cvss_value": "H",
+      "label": "Full System Crash / Outage",
+      "description": "Kernel panic, esaurimento totale delle risorse, cancellazione di dischi/storage o disservizio totale del servizio critico."
+    }
+  ],
+  "submetrics_by_id": {
+    "AV_N_PUBLIC_INTERNET": {
+      "id": "AV_N_PUBLIC_INTERNET",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "Public Internet-Facing",
+      "description": "Esposto direttamente su indirizzi IP/FQDN pubblici senza protezioni di rete perimetrali."
+    },
+    "AV_N_BACKBONE_TRANSIT": {
+      "id": "AV_N_BACKBONE_TRANSIT",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "ISP Backbone / Carrier Transit",
+      "description": "Infrastruttura di routing core/transito ISP o peering pubblico (BGP, router perimetrali di transito)."
+    },
+    "AV_N_INTERNAL_LAN": {
+      "id": "AV_N_INTERNAL_LAN",
+      "metric": "AV",
+      "cvss_value": "N",
+      "label": "Internal Routable LAN",
+      "description": "Rete interna aziendale o subnet di datacenter raggiungibile da altri segmenti interni tramite normale routing L3."
+    },
+    "AV_A_VPN_GATEWAY": {
+      "id": "AV_A_VPN_GATEWAY",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Corporate VPN / Tunnel Gateway",
+      "description": "Accesso condizionato all'autenticazione preventiva a una VPN aziendale (client-to-site o concentratore remoto)."
+    },
+    "AV_A_B2B_MPLS": {
+      "id": "AV_A_B2B_MPLS",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Intercompany Peering / B2B MPLS",
+      "description": "Connessioni dedicate chiuse verso partner terzi, fornitori o filiali (circuiti MPLS privati, cross-connect)."
+    },
+    "AV_A_L2_BROADCAST": {
+      "id": "AV_A_L2_BROADCAST",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Same L2 Broadcast Domain",
+      "description": "Richiede presenza sullo stesso switch, VLAN o dominio di broadcast locale (ARP spoofing, LLMNR, mDNS)."
+    },
+    "AV_A_WIRELESS_RADIO": {
+      "id": "AV_A_WIRELESS_RADIO",
+      "metric": "AV",
+      "cvss_value": "A",
+      "label": "Wireless / Radio Proximity",
+      "description": "Richiede raggio d'azione radio diretto (Wi-Fi Corporate/Guest, Bluetooth, BLE, Zigbee, RFID)."
+    },
+    "AV_L_SHELL_ACCESS": {
+      "id": "AV_L_SHELL_ACCESS",
+      "metric": "AV",
+      "cvss_value": "L",
+      "label": "Interactive Shell Access",
+      "description": "Richiede una sessione di login locale/remota già attiva sul target (SSH, RDP, terminale interattivo)."
+    },
+    "AV_L_DESKTOP_CLIENT": {
+      "id": "AV_L_DESKTOP_CLIENT",
+      "metric": "AV",
+      "cvss_value": "L",
+      "label": "Desktop / Endpoint Client",
+      "description": "Vulnerabilità in software desktop/CLI che richiede l'apertura o l'invocazione locale da parte dell'operatore."
+    },
+    "AV_P_HARDWARE_CONSOLE": {
+      "id": "AV_P_HARDWARE_CONSOLE",
+      "metric": "AV",
+      "cvss_value": "P",
+      "label": "Hardware Interface / Console",
+      "description": "Accesso tramite porte fisiche dirette (USB, JTAG, Thunderbolt) o console rack/laptop incustodito."
+    },
+    "AC_L_NO_EXPERIENCE": {
+      "id": "AC_L_NO_EXPERIENCE",
+      "metric": "AC",
+      "cvss_value": "L",
+      "label": "No Technical Experience Needed",
+      "description": "Exploit '1-click' o zero interazione tecnica; automatismi reperibili pubblicamente, interfacce web point-and-click."
+    },
+    "AC_L_COMMODITY_TOOLING": {
+      "id": "AC_L_COMMODITY_TOOLING",
+      "metric": "AC",
+      "cvss_value": "L",
+      "label": "Script Kiddie / Commodity Tooling",
+      "description": "Utilizzo di moduli Metasploit precompilati, script Python pronti su GitHub, scanner automatizzati con payload integrati."
+    },
+    "AC_H_EXPERT_DEVELOPER": {
+      "id": "AC_H_EXPERT_DEVELOPER",
+      "metric": "AC",
+      "cvss_value": "H",
+      "label": "Senior Exploit Developer / Expert",
+      "description": "Richiede scrittura di shellcode personalizzato, reverse-engineering del binario, bypass di protezioni (ASLR, DEP/W^X) o race condition temporali strette."
+    },
+    "AC_H_NATION_STATE_APT": {
+      "id": "AC_H_NATION_STATE_APT",
+      "metric": "AC",
+      "cvss_value": "H",
+      "label": "Nation-State / APT / Tier-1 Actor",
+      "description": "Richiede catene multi-exploit (chain 0-day), risorse computazionali estese per attacchi crittografici, bypass di protezioni hardware proprietarie o posizionamento su dorsali statali."
+    },
+    "PR_N_ANONYMOUS": {
+      "id": "PR_N_ANONYMOUS",
+      "metric": "PR",
+      "cvss_value": "N",
+      "label": "Anonymous / Public User",
+      "description": "Nessuna autenticazione necessaria; sfruttabile da chiunque raggiunga l'endpoint."
+    },
+    "PR_L_STANDARD_USER": {
+      "id": "PR_L_STANDARD_USER",
+      "metric": "PR",
+      "cvss_value": "L",
+      "label": "Standard End-User / Customer",
+      "description": "Richiede credenziali base (es. utente registrato su un portale e-commerce, account AD standard senza diritti admin)."
+    },
+    "PR_L_SERVICE_ACCOUNT": {
+      "id": "PR_L_SERVICE_ACCOUNT",
+      "metric": "PR",
+      "cvss_value": "L",
+      "label": "Service Account / Low Scope",
+      "description": "Credenziali di un microservizio o API key con permessi minimi di sola lettura o funzioni limitate."
+    },
+    "PR_H_DOMAIN_ADMIN": {
+      "id": "PR_H_DOMAIN_ADMIN",
+      "metric": "PR",
+      "cvss_value": "H",
+      "label": "Domain / Enterprise Admin",
+      "description": "Richiede privilegi massimi sull'infrastruttura (Domain Admin in Active Directory, root su Linux, Cloud IAM Global Admin)."
+    },
+    "PR_H_APP_DBA": {
+      "id": "PR_H_APP_DBA",
+      "metric": "PR",
+      "cvss_value": "H",
+      "label": "Application / Database DBA",
+      "description": "Privilegi amministrativi confinati alla singola applicazione o al database di backend."
+    },
+    "UI_N_ZERO_CLICK": {
+      "id": "UI_N_ZERO_CLICK",
+      "metric": "UI",
+      "cvss_value": "N",
+      "label": "Zero-Click / Autonomous",
+      "description": "Sfruttabile automaticamente all'arrivo del payload (demoni di rete, wormable)."
+    },
+    "UI_R_LINK_CLICK": {
+      "id": "UI_R_LINK_CLICK",
+      "metric": "UI",
+      "cvss_value": "R",
+      "label": "1-Click Phishing / Link Click",
+      "description": "La vittima deve cliccare su un link malevolo, visitare una pagina specifica o autorizzare un prompt (es. OAuth consent)."
+    },
+    "UI_R_FILE_DOWNLOAD_EXEC": {
+      "id": "UI_R_FILE_DOWNLOAD_EXEC",
+      "metric": "UI",
+      "cvss_value": "R",
+      "label": "File Download & Execution",
+      "description": "La vittima deve scaricare e aprire manualmente un file (es. macro Office, archivio malevolo, installer ingannevole)."
+    },
+    "S_U_APP_SANDBOX": {
+      "id": "S_U_APP_SANDBOX",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Strict Application Sandbox",
+      "description": "L'attacco è isolato nel runtime applicativo (es. un DoS che crasha solo il thread dell'app o SQLi confinata a un DB dedicato)."
+    },
+    "S_U_INTRA_SERVICE": {
+      "id": "S_U_INTRA_SERVICE",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Intra-Service / Local Isolation",
+      "description": "L'impatto non scavalca il set di permessi del processo vulnerabile né coinvolge altri tenant/sistemi."
+    },
+    "S_U_CONTAINED_COMPONENT": {
+      "id": "S_U_CONTAINED_COMPONENT",
+      "metric": "S",
+      "cvss_value": "U",
+      "label": "Contained in Component",
+      "description": "L'impatto resta confinato al runtime dell'applicazione o all'istanza vulnerabile (es. SQLi che impatta solo il DB dell'app)."
+    },
+    "S_C_APP_TO_HOST_RCE": {
+      "id": "S_C_APP_TO_HOST_RCE",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "App-to-Host RCE (Breakout)",
+      "description": "Vulnerabilità applicativa (es. deserialization/command injection) che fornisce un accesso a riga di comando sull'OS host, scavalcando la sandbox applicativa."
+    },
+    "S_C_CONTAINER_VM_ESCAPE": {
+      "id": "S_C_CONTAINER_VM_ESCAPE",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Container / VM Escape",
+      "description": "Fuga dal container Docker/K8s verso l'host node, o da VM guest verso l'hypervisor (KVM/ESXi)."
+    },
+    "S_C_CLOUD_IAM_PIVOT": {
+      "id": "S_C_CLOUD_IAM_PIVOT",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Cross-Tenant Cloud / IAM Pivot",
+      "description": "Sfruttamento dell'asset per rubare token temporanei (es. SSRF verso IMDSv1/v2) ed eseguire chiamate API autorizzate sul control plane Cloud."
+    },
+    "S_C_CROSS_USER_XSS": {
+      "id": "S_C_CROSS_USER_XSS",
+      "metric": "S",
+      "cvss_value": "C",
+      "label": "Cross-User Session (Stored XSS)",
+      "description": "Codice iniettato nell'applicazione che viene eseguito nel contesto di sicurezza del browser di altri utenti ignari."
+    },
+    "C_N_NO_DISCLOSURE": {
+      "id": "C_N_NO_DISCLOSURE",
+      "metric": "C",
+      "cvss_value": "N",
+      "label": "No Data Disclosure",
+      "description": "Nessuna perdita di riservatezza."
+    },
+    "C_L_SYSTEM_METADATA": {
+      "id": "C_L_SYSTEM_METADATA",
+      "metric": "C",
+      "cvss_value": "L",
+      "label": "System Metadata / Error Leaks",
+      "description": "Esposizione di versioni software, stack trace, percorsi interni o enumerazione di username."
+    },
+    "C_H_PII_BUSINESS_DATA": {
+      "id": "C_H_PII_BUSINESS_DATA",
+      "metric": "C",
+      "cvss_value": "H",
+      "label": "PII / Sensitive Business Data",
+      "description": "Esfiltrazione di dati personali (GDPR), carte di pagamento (PCI-DSS), segreti industriali o sorgenti core."
+    },
+    "C_H_CRYPTO_SECRETS": {
+      "id": "C_H_CRYPTO_SECRETS",
+      "metric": "C",
+      "cvss_value": "H",
+      "label": "Critical Cryptographic Secrets",
+      "description": "Compromissione di chiavi private TLS, token di firma JWT, credenziali di accesso master."
+    },
+    "I_N_NO_MODIFICATION": {
+      "id": "I_N_NO_MODIFICATION",
+      "metric": "I",
+      "cvss_value": "N",
+      "label": "No Modification",
+      "description": "I dati e i file di sistema non possono essere alterati."
+    },
+    "I_L_NON_CRITICAL_DATA": {
+      "id": "I_L_NON_CRITICAL_DATA",
+      "metric": "I",
+      "cvss_value": "L",
+      "label": "Non-Critical Data Alteration",
+      "description": "Modifica di preferenze utente, commenti, log superficiali o defacement cosmetico non strutturale."
+    },
+    "I_H_ARBITRARY_CODE_EXECUTION": {
+      "id": "I_H_ARBITRARY_CODE_EXECUTION",
+      "metric": "I",
+      "cvss_value": "H",
+      "label": "Arbitrary Code Execution (RCE)",
+      "description": "Capacità di scrivere file arbitrari, alterare binari di sistema, installare backdoor o modificare record di database transazionali."
+    },
+    "A_N_NO_IMPACT": {
+      "id": "A_N_NO_IMPACT",
+      "metric": "A",
+      "cvss_value": "N",
+      "label": "No Impact",
+      "description": "La disponibilità e i tempi di risposta non subiscono variazioni."
+    },
+    "A_L_DEGRADED_PERFORMANCE": {
+      "id": "A_L_DEGRADED_PERFORMANCE",
+      "metric": "A",
+      "cvss_value": "L",
+      "label": "Degraded Performance / Thread Hang",
+      "description": "Rallentamenti delle risposte, consumo elevato di CPU per singolo processo senza blocco del servizio globale."
+    },
+    "A_H_FULL_SYSTEM_CRASH": {
+      "id": "A_H_FULL_SYSTEM_CRASH",
+      "metric": "A",
+      "cvss_value": "H",
+      "label": "Full System Crash / Outage",
+      "description": "Kernel panic, esaurimento totale delle risorse, cancellazione di dischi/storage o disservizio totale del servizio critico."
+    }
+  }
+}

@@ -1,0 +1,506 @@
+{
+  "metadata": {
+    "title": "Catalogo Contromisure di Sicurezza Operative e Mitigazioni CVSS",
+    "version": "2.0.0",
+    "description": "Catalogo normalizzato di controlli preventivi e detective con specifica tecnica dettagliata, mappatura CWE rigorosa e differenziazione degli impatti sul punteggio CVSS Environmental.",
+    "taxonomy": {
+      "Preventive": {
+        "definition": "Controlli di mitigazione attiva che intervengono prima o durante il flusso di attacco, modificando la complessità, i privilegi o l'impatto tecnico con riduzione quantificabile sul punteggio CVSS Ambientale.",
+        "cvss_behavior": "Modifica i parametri CVSS Modified (MAC, MPR, MUI, MC, MI, MA)."
+      },
+      "Detective": {
+        "definition": "Controlli di visibilità, logging e telemetria che registrano, correlano e allertano sulle attività malevole, riducendo MTTD (Mean Time To Detect) e Dwell Time senza impedire l'exploit originario.",
+        "cvss_behavior": "Nessuna alterazione del vettore o punteggio CVSS (0.0 mod) per non falsare la severità oggettiva della vulnerabilità."
+      }
+    }
+  },
+  "countermeasures": [
+    {
+      "id": "CTRL-WAF",
+      "name": "Web Application Firewall (WAF)",
+      "category": "Sicurezza Perimetrale & Rete",
+      "type": "Preventive",
+      "description": "Filtra e ispeziona il traffico HTTP/HTTPS a livello Layer 7, bloccando pattern di attacco noti, iniezioni di payload malevoli e anomalie prima del backend applicativo.",
+      "technical_specification": "Dispositivo o servizio L7 interposto in modalità Reverse Proxy (es. AWS WAF, Cloudflare WAF, ModSecurity, F5 Advanced WAF). Esegue ispezione approfondita del payload HTTP/HTTPS (Headers, Cookie, Query String, Request Body decifrando TLS). Applica regole OWASP CRS (Core Rule Set), scoring basato su reputazione IP/ASN, analisi euristica dei caratteri speciali e virtual patching tempestivo per CVE note.",
+      "cwe_affinity": [
+        "Injection",
+        "XSS",
+        "LFI",
+        "RFI",
+        "Misconfiguration",
+        "CWE-79",
+        "CWE-89",
+        "CWE-22",
+        "CWE-94",
+        "CWE-98",
+        "CWE-78",
+        "CWE-943"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H",
+          "MA": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Il WAF non corregge il codice vulnerabile alla radice, ma costringe l'attaccante a sviluppare tecniche complesse di bypass o offuscamento (MAC da Low a High) e neutralizza richieste anomale massive salvaguardando la continuità del servizio (MA=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Blocco proattivo pre-routing applicativo",
+        "residual_risk_handling": "Necessario virtual patching per varianti di evasione WAF",
+        "attack_surface_reduction": "Elevata su protocolli HTTP/S"
+      },
+      "control_differentiation_note": "Preventive: Intercetta e rigetta fisicamente la connessione TCP/HTTP malevola con codice 403 Forbidden prima che raggiunga l'interprete applicativo sottostante."
+    },
+    {
+      "id": "CTRL-NET-SEG",
+      "name": "Network Segmentation & Microsegmentation",
+      "category": "Sicurezza Perimetrale & Rete",
+      "type": "Preventive",
+      "description": "Isola i carichi di lavoro e restringe i flussi di rete laterali tramite firewall interni, VLAN, policy di rete SDN o NetworkPolicy Kubernetes in logica Default-Deny.",
+      "technical_specification": "Architettura di segmentazione L3/L4/L7 perimetrale e intra-datacenter. Include tabelle di routing ristrette, Access Control List (ACL), Cloud Security Groups, Network Security Policies container (Calico, Cilium eBPF) con logica zero-trust default-deny. Blocca completamente le comunicazioni East-West non autorizzate e il traffico egress verso destinazioni arbitrarie.",
+      "cwe_affinity": [
+        "Lateral Movement",
+        "SSRF",
+        "Misconfiguration",
+        "CWE-918",
+        "CWE-16",
+        "CWE-1188",
+        "CWE-1008",
+        "CWE-284"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H",
+          "MUI": "R"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "La segmentazione impedisce la propagazione automatica e il pivot diretto verso altri tenant/segmenti, costringendo l'attaccante a percorsi complessi di tunneling (MAC=H) e spesso richiedendo cooperazione o credenziali di un operatore di rete (MUI=R)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Confinamento volumetrico del perimetro d'attacco",
+        "residual_risk_handling": "Isolamento dell'asset in caso di breccia iniziale",
+        "attack_surface_reduction": "Drastico abbattimento del movimento laterale"
+      },
+      "control_differentiation_note": "Preventive: Scarta i pacchetti di rete destinati a porte o subnet non espressamente consentite, impedendo il raggiungimento del componente vulnerabile da segmenti non autorizzati."
+    },
+    {
+      "id": "CTRL-DDOS",
+      "name": "Anti-DDoS Protection",
+      "category": "Sicurezza Perimetrale & Rete",
+      "type": "Preventive",
+      "description": "Piattaforma di scrubbing distribuito che assorbe e mitiga attacchi volumetrici L3/L4 e flooding applicativo L7 diretti a saturare la disponibilità del servizio.",
+      "technical_specification": "Infrastruttura Anycast multi-terabit/s (es. AWS Shield Advanced, Cloudflare Magic Transit, Akamai Prolexic). Rileva flussi anomali (SYN floods, UDP amplification, DNS reflection, HTTP GET/POST flood) deviandoli verso centri di scrubbing con rate-limiting automatico, challenge crittografiche (JS challenge/CAPTCHA) e blocco perimetrale dei botnet.",
+      "cwe_affinity": [
+        "DoS",
+        "Resource Exhaustion",
+        "CWE-400",
+        "CWE-770",
+        "CWE-799"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MA": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su disponibilità",
+        "justification": "Assorbe il volume di traffico distruttivo all'edge preservando la capacità di calcolo del backend, riducendo l'impatto sulla disponibilità a un degrado marginale controllato (MA=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Filtraggio volumetrico all'edge",
+        "residual_risk_handling": "Monitoraggio delle soglie di rate limit",
+        "attack_surface_reduction": "Protezione integrale della bandwidth"
+      },
+      "control_differentiation_note": "Preventive: Neutralizza la congestione all'ingresso della rete assorbendo i picchi di pacchetti malevoli prima che saturino le code dell'infrastruttura."
+    },
+    {
+      "id": "CTRL-API-GW",
+      "name": "API Gateway con Schema Validation",
+      "category": "Sicurezza Perimetrale & Rete",
+      "type": "Preventive",
+      "description": "Centralizza l'esposizione delle API imponendo la validazione stretta dello schema (OpenAPI/JSON Schema), scartando payload malformati prima del routing al backend.",
+      "technical_specification": "Gateway API enterprise (es. Kong, Apigee, Envoy, AWS API Gateway) configurato per validare obbligatoriamente ogni richiesta in entrata rispetto a un contratto OpenAPI 3.x strict. Esegue deserializzazione controllata, validazione di tipo (type checking), regex su pattern di stringa e rigetto categorico di campi addizionali non dichiarati (additionalProperties: false).",
+      "cwe_affinity": [
+        "Injection",
+        "Mass Assignment",
+        "Broken Object Level Authorization",
+        "Improper Input Validation",
+        "CWE-20",
+        "CWE-915",
+        "CWE-285",
+        "CWE-639",
+        "CWE-74"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Impedisce l'invio di payload con strutture arbitrarie o parametri sporchi verso il backend. L'attaccante è costretto a trovare falle puramente logiche all'interno di valori perfettamente validi per lo schema (MAC=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Scarto immediato di richieste con contratti non validi",
+        "residual_risk_handling": "Verifica continua delle specifiche OpenAPI",
+        "attack_surface_reduction": "Barriera di ingresso uniforme per tutti i microservizi"
+      },
+      "control_differentiation_note": "Preventive: Blocca a livello architetturale qualsiasi richiesta non aderente al contratto semantico prima dell'invio al codice di backend."
+    },
+    {
+      "id": "CTRL-MFA",
+      "name": "Multi-Factor Authentication (MFA)",
+      "category": "Identità e Accessi (IAM)",
+      "type": "Preventive",
+      "description": "Richiede due o più fattori indipendenti di verifica (knowledge, possession, inherence) per concedere l'autenticazione ai sistemi.",
+      "technical_specification": "Integrazione IdP aziendale con standard FIDO2 / WebAuthn, hardware security keys (YubiKey), push notification con number matching e TOTP RFC 6238. Valutazione del rischio contestuale (Adaptive Risk-based Authentication) basata su geolocalizzazione, device health compliance e machine identity. Esclusione tassativa di SMS ed email come fattori primari.",
+      "cwe_affinity": [
+        "Broken Authentication",
+        "Credential Stuffing",
+        "Brute Force",
+        "CWE-287",
+        "CWE-306",
+        "CWE-307",
+        "CWE-798",
+        "CWE-522"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Rende inutile il solo possesso di password rubate o generate via brute force. L'attaccante deve condurre attacchi AiTM (Adversary in the Middle) sofisticati o session hijacking in real-time (MAC=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Blocco categorico di accessi basati su sole credenziali statiche",
+        "residual_risk_handling": "Protezione contro password reuse e credential stuffing",
+        "attack_surface_reduction": "Neutralizzazione della maggioranza dei vettori di phishing convenzionale"
+      },
+      "control_differentiation_note": "Preventive: Nega l'emissione del token di sessione autenticata in mancanza del secondo fattore valido."
+    },
+    {
+      "id": "CTRL-PAM",
+      "name": "Privileged Access Management (PAM)",
+      "category": "Identità e Accessi (IAM)",
+      "type": "Preventive",
+      "description": "Gestisce, isola e ruota dinamicamente le credenziali degli account privilegiati (root, admin, service accounts) tramite vaulting e accessi Just-in-Time.",
+      "technical_specification": "Piattaforma PAM (CyberArk, HashiCorp Vault, BeyondTrust) con vaulting crittografato delle credenziali amministrative, rotazione automatica ad ogni utilizzo (one-time passwords), generazione di credenziali effimere Just-In-Time (JIT) correlate a ticket di autorizzazione, e broker di sessione isolata (jump-host con registrazione video/keystroke).",
+      "cwe_affinity": [
+        "Privilege Escalation",
+        "Broken Authentication",
+        "Misconfiguration",
+        "CWE-250",
+        "CWE-269",
+        "CWE-732",
+        "CWE-284",
+        "CWE-266"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MPR": "H"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su privilegi",
+        "justification": "Elimina la presenza di password amministrative cablate o statiche. Qualsiasi azione richiede l'elevazione supervisionata con diritti di Domain o Enterprise Admin (MPR=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Impedisce il login diretto non mediato con privilegi elevati",
+        "residual_risk_handling": "Scadenza temporale forzata dei token di elevazione",
+        "attack_surface_reduction": "Abbattimento del furto di credenziali privilegiate residenti in memoria"
+      },
+      "control_differentiation_note": "Preventive: Impedisce l'acquisizione diretta di privilegi amministrativi senza l'autorizzazione crittografica emessa dal vault centrale."
+    },
+    {
+      "id": "CTRL-RATE-LIMIT",
+      "name": "Anti-Bruteforce & Rate Limiting",
+      "category": "Identità e Accessi (IAM)",
+      "type": "Preventive",
+      "description": "Limita la frequenza di invocazione delle richieste entro finestre temporali definite, contrastando attacchi di forza bruta, credential stuffing e abuse.",
+      "technical_specification": "Algoritmi di throttling distribuito (Token Bucket / Sliding Window Counter su cluster Redis o ingress Nginx/Envoy). Monitora e applica soglie restrittive su metriche composite (IP sorgente, user-agent, username, API token), attivando risposte HTTP 429 Too Many Requests, exponential backoff forzato e blocchi temporanei via tarpit.",
+      "cwe_affinity": [
+        "Broken Authentication",
+        "DoS",
+        "Brute Force",
+        "CWE-307",
+        "CWE-799",
+        "CWE-400"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MA": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Arresta i tentativi di enumerazione automatica di massa e la saturazione dei backend computazionali, preservando la disponibilità del servizio per gli utenti legittimi (MA=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Strozzatura immediata di pattern di traffico anomalo",
+        "residual_risk_handling": "Regolazione dinamica in base alle ore di picco",
+        "attack_surface_reduction": "Impedisce attacchi brute force ad alta velocità"
+      },
+      "control_differentiation_note": "Preventive: Rifiuta l'elaborazione delle richieste eccedenti la soglia consentita, preservando lo stato del database e delle API."
+    },
+    {
+      "id": "CTRL-ENC-REST",
+      "name": "Cifratura at Rest",
+      "category": "Sicurezza Dati & Crittografia",
+      "type": "Preventive",
+      "description": "Protegge i dati archiviati (database, filesystem, storage di backup e bucket) mediante crittografia forte con chiavi gestite in KMS/HSM dedicato.",
+      "technical_specification": "Crittografia a livello di volume (dm-crypt/LUKS, BitLocker, AWS EBS KMS), Transparent Data Encryption (TDE) nei database engines e crittografia a livello di applicazione con algoritmi standard AES-256-GCM o ChaCha20-Poly1305. Gestione delle Customer Master Keys (CMK) in HSM certificato FIPS 140-2 Level 3 con envelope encryption e rotazione periodica.",
+      "cwe_affinity": [
+        "Sensitive Data Exposure",
+        "Insecure Storage",
+        "CWE-311",
+        "CWE-312",
+        "CWE-313",
+        "CWE-326"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MC": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su confidenzialità",
+        "justification": "Rende i dati incomprensibili e inutilizzabili in caso di furto diretto di supporti di memoria, dump grezzi o snapshot di backup senza accesso contestuale al KMS, declassando l'impatto sulla confidenzialità (MC=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Protezione matematica dell'informazione memorizzata",
+        "residual_risk_handling": "Revoca immediata della chiave per neutralizzare dump esfiltrati",
+        "attack_surface_reduction": "Eliminazione del rischio di data leak da dismissione hardware"
+      },
+      "control_differentiation_note": "Preventive: Impedisce matematicamente la lettura dei dati memorizzati a chiunque non sia autorizzato e privo della chiave crittografica."
+    },
+    {
+      "id": "CTRL-ENC-TRANSIT",
+      "name": "Cifratura in Transit (TLS 1.2+ / mTLS)",
+      "category": "Sicurezza Dati & Crittografia",
+      "type": "Preventive",
+      "description": "Garantisce la confidenzialità e l'integrità dei dati scambiati tra client e server o tra microservizi interni attraverso canali crittografati sicuri.",
+      "technical_specification": "Imposizione rigorosa di TLS 1.3 o TLS 1.2 hardened con sole cipher suites provviste di Perfect Forward Secrecy (PFS: ECDHE-RSA/ECDSA con AES-GCM o Poly1305). Disattivazione totale di SSLv3, TLS 1.0, TLS 1.1 e ciphers deboli (CBC, RC4). Adozione di mTLS (mutual TLS) con certificati X.509 emessi da CA interna e forzatura di HSTS (HTTP Strict Transport Security).",
+      "cwe_affinity": [
+        "Sensitive Data Exposure",
+        "Man-in-the-Middle",
+        "CWE-319",
+        "CWE-300",
+        "CWE-326",
+        "CWE-295"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MC": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su confidenzialità",
+        "justification": "Neutralizza i rischi di intercettazione passiva, sniffing di rete e attacchi Man-in-the-Middle su dorsali o reti locali condivise, preservando la confidenzialità (MC=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Cifratura end-to-end su ogni sessione di rete",
+        "residual_risk_handling": "Revoca certificati compromessi via CRL/OCSP stapling",
+        "attack_surface_reduction": "Chiusura del vettore di intercettazione in chiaro"
+      },
+      "control_differentiation_note": "Preventive: Rende indecifrabili i flussi di dati in transito sulla rete per qualsiasi osservatore esterno o intermedio."
+    },
+    {
+      "id": "CTRL-DIG-SIGN",
+      "name": "Firma Digitale / JWT Validation",
+      "category": "Sicurezza Dati & Crittografia",
+      "type": "Preventive",
+      "description": "Utilizza firme digitali asimmetriche o HMAC per garantire l'autenticità, l'integrità e la non ripudiabilità dei token di sessione e dei dati di payload.",
+      "technical_specification": "Validazione crittografica obbligatoria di JSON Web Token (JWT/JWS RFC 7515) e firme digitali asimmetriche (RSASSA-PSS, Ed25519) o HMAC-SHA256. Verifica automatica di signature, expiration time (exp), audience (aud), issuer (iss) e rigetto immediato di algoritmi non ammessi (es. 'none' algorithm bypass).",
+      "cwe_affinity": [
+        "Data Tampering",
+        "Insecure Deserialization",
+        "Broken Authentication",
+        "CWE-345",
+        "CWE-347",
+        "CWE-353",
+        "CWE-287"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MI": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su integrità",
+        "justification": "Rileva e rigetta immediatamente qualsiasi payload o token manomesso prima che venga elaborato dalla logica transazionale, abbattendo l'impatto sulla compromissione dell'integrità (MI=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Scarto di dati alterati all'atto della verifica della firma",
+        "residual_risk_handling": "Rotazione delle chiavi di signing con set JWKS",
+        "attack_surface_reduction": "Protezione contro la contraffazione di privilegi"
+      },
+      "control_differentiation_note": "Preventive: Impedisce l'esecuzione o l'accettazione di payload manomessi attraverso verifica crittografica deterministica."
+    },
+    {
+      "id": "CTRL-EDR",
+      "name": "Endpoint Detection and Response (EDR/XDR)",
+      "category": "Sicurezza Endpoint & Workload",
+      "type": "Detective",
+      "description": "Monitora costantemente host fisici, virtual machine e workload containerizzati rilevando anomalie comportamentali, esecuzioni sospette e movimenti laterali.",
+      "technical_specification": "Agente kernel/user-space installato sui sistemi (CrowdStrike Falcon, SentinelOne, Microsoft Defender for Endpoint). Raccoglie telemetria continua su alberi di processi (process lineage), chiamate di sistema (Sysmon / eBPF), iniezioni di memoria (DLL injection, hollow processes), accessi ai registri, comandi shell anomali e connessioni di rete sospette, correlando gli eventi con la matrice MITRE ATT&CK.",
+      "cwe_affinity": [
+        "Malware",
+        "RCE",
+        "Privilege Escalation",
+        "Lateral Movement",
+        "CWE-78",
+        "CWE-94",
+        "CWE-269",
+        "All"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {},
+        "cvss_score_effect": "Nessuna riduzione numerica sul punteggio CVSS (0.0 mod)",
+        "justification": "Controllo rigorosamente DETECTIVE. Non modifica i requisiti di accesso o l'exploitability intrinseca della vulnerabilità, ma abbatte drasticamente il Mean Time To Detect (MTTD) e il dwell time dell'attaccante, consentendo isolamento immediato e forensic triage."
+      },
+      "operational_metrics": {
+        "mttd_reduction": "Rilevamento in tempo reale (< 5 minuti)",
+        "dwell_time_mitigation": "Abbattimento del dwell time da settimane a minuti",
+        "audit_trail_retention": "Registrazione telemetrica dettagliata di tutti gli eventi host",
+        "ir_readiness": "Capacità di isolamento di rete dell'host con un clic dal SOC"
+      },
+      "control_differentiation_note": "Detective: Fornisce visibilità profonda e alert sugli exploit in corso senza alterare a priori la vulnerabilità o la complessità di iniezione originaria del software."
+    },
+    {
+      "id": "CTRL-HARDENING",
+      "name": "OS & Container Hardening",
+      "category": "Sicurezza Endpoint & Workload",
+      "type": "Preventive",
+      "description": "Riduce la superficie di attacco disabilitando servizi superflui, imponendo profili restrittivi (seccomp, AppArmor, SELinux) ed eseguendo i processi in utenze a privilegi minimi.",
+      "technical_specification": "Adozione sistematica di benchmark di sicurezza (CIS Benchmark, DISA STIG). Rimozione di interpreti e compiler dagli ambienti di runtime, filesystem di root montato in sola lettura (read-only rootfs), applicazione di profili seccomp per filtrare le syscall di sistema ammesse, kernel hardening con ASLR e DEP forzati, disabilitazione suid/sgid e divieto categorico di esecuzione con UID root (0).",
+      "cwe_affinity": [
+        "Misconfiguration",
+        "Privilege Escalation",
+        "CWE-16",
+        "CWE-250",
+        "CWE-269",
+        "CWE-732",
+        "CWE-276"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H",
+          "MPR": "H"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Limita fortemente i vettori e le chiamate di sistema utilizzabili dopo la compromissione iniziale. Richiede bypass di protezioni kernel (MAC=H) e permessi elevati non presenti nel container o sull'utenza ristretta (MPR=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Inibizione a livello kernel di operazioni malevole",
+        "residual_risk_handling": "Confinamento stretto dei processi nel loro namespace",
+        "attack_surface_reduction": "Minimizzazione drastica dei binari e librerie presenti"
+      },
+      "control_differentiation_note": "Preventive: Impedisce l'esecuzione di syscall e l'accesso a risorse di sistema non esplicitamente autorizzate nel profilo di sicurezza."
+    },
+    {
+      "id": "CTRL-SIEM",
+      "name": "Centralized Logging & SIEM Integration",
+      "category": "Rilevamento",
+      "type": "Detective",
+      "description": "Raccoglie, aggrega e correla log da molteplici fonti eterogenee per generare alert in tempo reale su pattern malevoli (IoC), anomalie e catene d'attacco.",
+      "technical_specification": "Piattaforma SIEM/SOAR enterprise (Splunk, Microsoft Sentinel, Elastic SIEM, Google Chronicle). Raccolta log standardizzata (Syslog, WEC, CloudTrail, Web server logs), normalizzazione (schema OCSF/CIM), correlazione di eventi basata su regole SIGMA, threat intelligence feeds e motori UEBA per il rilevamento di deviazioni statistiche nel comportamento degli account.",
+      "cwe_affinity": [
+        "Insufficient Logging & Monitoring",
+        "CWE-778",
+        "All"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {},
+        "cvss_score_effect": "Nessuna riduzione numerica sul punteggio CVSS (0.0 mod)",
+        "justification": "Controllo rigorosamente DETECTIVE. Non ostacola la fattibilità dell'exploit o la vulnerabilità intrinseca, ma garantisce visibilità forense, tracciabilità legale (non-ripudio) e notifica istantanea al SOC per l'avvio della procedura di Incident Response."
+      },
+      "operational_metrics": {
+        "mttd_reduction": "Correlazione rapida di segnali sparsi da più sistemi",
+        "dwell_time_mitigation": "Riduzione dei tempi di scoperta dell'intrusione",
+        "audit_trail_retention": "Conservazione log sicura e immutabile (WORM) per conformità",
+        "ir_readiness": "Supporto investigativo completo per la timeline dell'attacco"
+      },
+      "control_differentiation_note": "Detective: Non blocca la chiamata dell'attaccante all'origine, ma ne registra l'evidenza per consentire una risposta difensiva rapida ed efficace."
+    },
+    {
+      "id": "CTRL-CSP",
+      "name": "Content Security Policy (CSP)",
+      "category": "Sicurezza Applicativa",
+      "type": "Preventive",
+      "description": "Header di sicurezza HTTP che definisce le fonti attendibili per risorse esterne ed esecuzione script, neutralizzando gran parte degli attacchi XSS e data injection.",
+      "technical_specification": "Header 'Content-Security-Policy' con policy restrittive (default-src 'self'; script-src 'self' 'nonce-...' strict-dynamic; object-src 'none'; base-uri 'self'; require-trusted-types-for 'script'). Impedisce l'esecuzione di codice JavaScript inline non firmato, l'uso di eval(), e blocca l'inclusione di frame da domini terzi malevoli.",
+      "cwe_affinity": [
+        "XSS",
+        "Data Injection",
+        "Clickjacking",
+        "CWE-79",
+        "CWE-1021",
+        "CWE-116",
+        "CWE-74"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Impedisce al browser della vittima di eseguire codice malevolo iniettato. Per superare una CSP restrittiva con nonce, l'attaccante deve reperire gadget script complessi o vulnerabilità nel codice fidato (MAC=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Blocco dell'esecuzione di script non autorizzati nel browser",
+        "residual_risk_handling": "Monitoraggio delle violazioni tramite report-uri / report-to",
+        "attack_surface_reduction": "Disinnesco dell'efficacia di payload XSS stored o reflected"
+      },
+      "control_differentiation_note": "Preventive: Ordina al motore di rendering del browser di rifiutare l'interpretazione ed esecuzione di codice non validato dal nonce."
+    },
+    {
+      "id": "CTRL-RASP",
+      "name": "Runtime Application Self-Protection (RASP)",
+      "category": "Sicurezza Applicativa",
+      "type": "Preventive",
+      "description": "Agente integrato nel runtime applicativo (JVM, CLR, Node.js) che monitora e blocca gli exploit in memoria analizzando il flusso del codice in tempo reale.",
+      "technical_specification": "Strumentazione bytecode / hook di runtime (es. Snyk AppRisk, Imperva RASP, Contrast Security). Si ancora ai punti critici di ingresso e uscita delle chiamate di sistema (interrogazioni SQL, manipolazione filesystem, deserializzazione di oggetti, invocazione di shell di comando), verificando la semantica dei dati prima dell'esecuzione vera e propria.",
+      "cwe_affinity": [
+        "Injection",
+        "XSS",
+        "Insecure Deserialization",
+        "RCE",
+        "CWE-89",
+        "CWE-78",
+        "CWE-502",
+        "CWE-94",
+        "CWE-917"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H",
+          "MC": "L",
+          "MI": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score",
+        "justification": "Opera dall'interno del runtime bloccando chiamate distruttive anche di fronte a 0-day sconosciuti. Eleva la complessità dell'exploit (MAC=H) e abbatte radicalmente l'impatto su riservatezza (MC=L) e integrità (MI=L)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Terminazione immediata del thread malevolo all'interno dell'app",
+        "residual_risk_handling": "Protezione contro payload con bypass WAF noti",
+        "attack_surface_reduction": "Copertura profonda sulle vulnerabilità logiche applicative"
+      },
+      "control_differentiation_note": "Preventive: Interrompe l'esecuzione del metodo applicativo o della query SQL pericolosa prima che essa possa produrre effetti dannosi."
+    },
+    {
+      "id": "CTRL-PREP-STMT",
+      "name": "Prepared Statements (ORM / Parametrizzazione)",
+      "category": "Sicurezza Applicativa",
+      "type": "Preventive",
+      "description": "Separazione rigorosa tra la logica del comando SQL/NoSQL e i dati forniti dall'utente demandata al compilatore del driver database o all'ORM.",
+      "technical_specification": "Utilizzo mandatorio di Prepared Statements nativi (JDBC PreparedStatement, PDO prepared queries, database binary protocol) o mapping relazionale a oggetti (Hibernate, Prisma, SQLAlchemy, Entity Framework) con parametri vincolati a tipi primitivi. Divieto assoluto di concatenazione di stringhe in costrutti di query dinamiche.",
+      "cwe_affinity": [
+        "SQL Injection",
+        "NoSQL Injection",
+        "CWE-89",
+        "CWE-943",
+        "CWE-564",
+        "CWE-20"
+      ],
+      "cvss_impact": {
+        "modified_metrics": {
+          "MAC": "H",
+          "MI": "L"
+        },
+        "cvss_score_effect": "Riduzione numerica su CVSS Environmental Score su integrità e complessità",
+        "justification": "Separa i dati dal codice della query a livello di compilazione DB. Tentare di alterare la struttura della query è vano; l'impatto su integrità è minimizzato (MI=L) e la complessità di attacco innalzata al massimo (MAC=H)."
+      },
+      "operational_metrics": {
+        "prevention_capability": "Neutralizzazione strutturale dell'alterazione sintattica della query",
+        "residual_risk_handling": "Validazione aggiuntiva per parametri di ordinamento/nomi tabelle",
+        "attack_surface_reduction": "Protezione totale contro iniezioni logiche sul motore database"
+      },
+      "control_differentiation_note": "Preventive: Il motore del database compila la sintassi della query prima di inserire i parametri utente, rendendo impossibile l'interpretazione di codice SQL arbitrario."
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "families": {
+    "xss": {
+      "name": "Cross-Site Scripting (XSS)",
+      "match_keywords": ["xss", "cross-site scripting", "cross site scripting", "script inclusion", "cwe-79"],
+      "description": "Iniezione di script nel contesto browser della vittima. L'impatto dipende dai cookie flag, dal contesto di reflection e dall'isolamento del dominio.",
+      "questions": [
+        {
+          "id": "xss_endpoint_exposure",
+          "title": "Accessibilità dell'Endpoint Vulnerabile",
+          "question_to_ask": "L'endpoint e il parametro in cui avviene la reflection sono raggiungibili pubblicamente senza autenticazione o richiedono una sessione di backoffice/ruoli specifici?",
+          "analyst_guidance": "Se l'endpoint è pubblico (es. form di ricerca o landing page), l'attacco su larga scala via phishing è banale. Se richiede privilegi di backoffice, l'attaccante deve prima compromettere un operatore interno, riducendo drasticamente la superficie.",
+          "options": [
+            { "label": "Pubblico / Nessuna Autenticazione", "posture": "Aggravante", "details": "Sfruttabile tramite un semplice link inviato a qualsiasi utente su Internet." },
+            { "label": "Richiede Autenticazione Standard", "posture": "Neutro", "details": "La vittima deve avere un account registrato e una sessione attiva." },
+            { "label": "Area Riservata / Solo Operatori Interni", "posture": "Mitigante", "details": "Superficie ridotta: sfruttabile solo contro il ristretto gruppo di amministratori/operatori abilitati." }
+          ]
+        },
+        {
+          "id": "xss_cookie_flags",
+          "title": "Protezione Token di Sessione (HttpOnly & SameSite)",
+          "question_to_ask": "I cookie di sessione applicativi e i token sensibili hanno i flag HttpOnly, Secure e SameSite (Lax/Strict) attivi?",
+          "analyst_guidance": "Il rischio primario di un XSS è il furto di sessione via 'document.cookie'. Con HttpOnly attivo, JavaScript NON può leggere il cookie! L'impatto si riduce ad azioni sul DOM o redirect, smentendo l'impatto di 'Account Takeover immediato' spesso dichiarato dai pentester.",
+          "options": [
+            { "label": "HttpOnly e Secure Attivi", "posture": "Mitigante", "details": "I token di sessione non possono essere esfiltrati via script. Furto credenziali bloccato." },
+            { "label": "Sessione memorizzata in LocalStorage / Cookie senza HttpOnly", "posture": "Aggravante", "details": "I token JWT o cookie sono immediatamente accessibili via script: account takeover totale." },
+            { "label": "Architettura Token-Based con Refresh Token protetto", "posture": "Mitigante", "details": "Access token effimero (5 min) e refresh token confinato in cookie HttpOnly." }
+          ]
+        },
+        {
+          "id": "xss_reflection_method",
+          "title": "Vettore di Invocazione (GET vs POST / CSRF)",
+          "question_to_ask": "La reflection avviene tramite richiesta GET (linkabile direttamente nell'URL) o solo tramite richiesta POST con controlli anti-CSRF?",
+          "analyst_guidance": "Un XSS in GET è a '1-click' (basta far cliccare un link). Un XSS in POST richiede di forzare un form submission o exploitare una concomitante mancanza di CSRF token. Se il metodo è POST e c'è anti-CSRF o Content-Type JSON, lo sfruttamento pratico è quasi nullo.",
+          "options": [
+            { "label": "Parametro in GET (Query String / URL)", "posture": "Aggravante", "details": "Massima facilità: link malevolo diretto inviabile via chat, email o social." },
+            { "label": "Parametro in POST senza Anti-CSRF", "posture": "Neutro", "details": "Richiede un sito terzo che effettua un auto-submit form verso l'endpoint vulnerabile." },
+            { "label": "Richiesta POST con Header Custom / JSON / Anti-CSRF", "posture": "Mitigante", "details": "Il browser blocca chiamate cross-origin arbitrarie (pre-flight CORS), rendendo l'exploit quasi infattibile." }
+          ]
+        },
+        {
+          "id": "xss_domain_isolation",
+          "title": "Isolamento di Dominio (Sandbox / Multi-tenant)",
+          "question_to_ask": "La pagina gira su un dominio isolato (es. 'sandbox.azienda.com' o tenant separato) o sul dominio principale (es. 'app.azienda.com') che gestisce dati core?",
+          "analyst_guidance": "Se l'applicazione è isolata su un sottodominio sandbox privo di cookie del dominio genitore, un XSS non può toccare la sessione principale dell'utente sui servizi core.",
+          "options": [
+            { "label": "Dominio Core / Condiviso con altri Servizi", "posture": "Aggravante", "details": "L'XSS può tentare di intercettare richieste verso altri microservizi sullo stesso dominio genitore." },
+            { "label": "Dominio Dedicato / Sandbox Isolato", "posture": "Mitigante", "details": "Anche in caso di esecuzione malevola, il blast radius è confinato all'applicazione isolata." }
+          ]
+        }
+      ]
+    },
+    "sqli": {
+      "name": "SQL / NoSQL Injection",
+      "match_keywords": ["sql injection", "sqli", "nosql", "database injection", "cwe-89", "cwe-943"],
+      "description": "Manipolazione della query verso il database. L'impatto reale dipende dai permessi dell'utente DB, da stacked queries e dalla segmentazione.",
+      "questions": [
+        {
+          "id": "sqli_privileges",
+          "title": "Privilegi dell'Utenza Database di Connessione",
+          "question_to_ask": "L'applicazione si connette al database con un utente 'sa/dba/root' con pieni poteri o con un utente applicativo a minimi privilegi (solo SELECT/INSERT su tabelle specifiche)?",
+          "analyst_guidance": "Spesso i pentester descrivono l'SQLi come 'compromissione dell'intero server DB'. Se l'utenza è ristretta (least privilege), non può fare DROP di tabelle di sistema, leggere altre viste o eseguire xp_cmdshell/UDF per fare RCE.",
+          "options": [
+            { "label": "Minimi Privilegi (Solo SELECT/DML limitata)", "posture": "Mitigante", "details": "Non può accedere a schemi di sistema né eseguire comandi operativi sul server DB." },
+            { "label": "Permessi Standard su tutto il Database Applicativo", "posture": "Neutro", "details": "Può leggere e alterare tutte le tabelle dell'applicazione specifica, ma non l'OS host." },
+            { "label": "DBA / Root / sa (Superuser)", "posture": "Aggravante", "details": "Pieno controllo del server DB, possibile elevazione ad OS command execution." }
+          ]
+        },
+        {
+          "id": "sqli_stacked_queries",
+          "title": "Supporto a Stacked Queries & Multiple Statements",
+          "question_to_ask": "Il driver del database e il connettore framework consentono l'esecuzione di query multiple separate da punto e virgola (;)?",
+          "analyst_guidance": "Se il driver (es. PHP PDO senza emulazione, psycopg2) rifiuta le stacked queries, l'attaccante non può accodare una seconda query distruttiva (es. '; DROP TABLE...') ma può solo tentare di alterare la singola SELECT.",
+          "options": [
+            { "label": "Stacked Queries Disabilitate dal Driver", "posture": "Mitigante", "details": "Non è possibile eseguire statement multipli distruttivi o comandi di sistema." },
+            { "label": "Stacked Queries Abilitate", "posture": "Aggravante", "details": "Possibile accodamento di comandi arbitrari DDL o chiamate a stored procedure." }
+          ]
+        },
+        {
+          "id": "sqli_data_exposure",
+          "title": "Tipologia di Dati Residenti nel Database Coinvolto",
+          "question_to_ask": "Il database impattato contiene dati sensibili (carte di credito, hash password, PII) o solo dati di lookup/catalogo pubblico?",
+          "analyst_guidance": "Se la tabella vulnerabile risiede in un database di reporting con dati fittizi o catalogo aperto, l'impatto di riservatezza (C) non è High ma Low.",
+          "options": [
+            { "label": "Catalogo Pubblico / Dati Non Sensibili", "posture": "Mitigante", "details": "Nessun impatto su dati riservati aziendali o conformità privacy." },
+            { "label": "Dati Operativi Interni", "posture": "Neutro", "details": "Esposizione di transazioni commerciali o metadati interni." },
+            { "label": "Credenziali, Password Hash o PII Regolamentate", "posture": "Aggravante", "details": "Rischio data breach immediato con obblighi di notifica garante." }
+          ]
+        }
+      ]
+    },
+    "ssrf": {
+      "name": "Server-Side Request Forgery (SSRF)",
+      "match_keywords": ["ssrf", "server-side request forgery", "server side request", "cwe-918"],
+      "description": "Il server effettua richieste di rete arbitrarie per conto dell'attaccante. La gravità reale dipende dall'accesso a IMDS Cloud (169.254.169.254) e dalla segmentazione.",
+      "questions": [
+        {
+          "id": "ssrf_imds_access",
+          "title": "Accessibilità del Metadata Service Cloud (IMDS)",
+          "question_to_ask": "L'asset risiede in Cloud (AWS/Azure/GCP) e ha accesso all'indirizzo di metadata (169.254.169.254)? È forzato IMDSv2 (con session token via PUT)?",
+          "analyst_guidance": "In ambienti Cloud, il target principale di un SSRF è rubare i token IAM tramite l'IMDS. Se IMDSv2 è forzato, richiede un header HTTP 'X-aws-ec2-metadata-token' che la maggior parte degli SSRF non può forgiare, neutralizzando il pivot sul control plane!",
+          "options": [
+            { "label": "IMDSv2 Obbligatorio (Token Required) o IMDS Disabilitato", "posture": "Mitigante", "details": "Il furto di credenziali IAM di istanza è tecnicamente bloccato." },
+            { "label": "Ambiente On-Premise / Nessun Metadata Service", "posture": "Mitigante", "details": "Nessun rischio di estrazione credenziali cloud." },
+            { "label": "IMDSv1 Abilitato (Richieste GET senza Header)", "posture": "Aggravante", "details": "Possibile furto immediato del ruolo IAM dell'istanza con pivot su AWS/Cloud." }
+          ]
+        },
+        {
+          "id": "ssrf_network_egress",
+          "title": "Policy di Uscita di Rete (Egress Filtering)",
+          "question_to_ask": "L'applicazione può chiamare liberamente qualsiasi indirizzo IP privato interno (10.0.0.0/8, 192.168.0.0/16, localhost) o ci sono firewall/security group che bloccano le chiamate interne?",
+          "analyst_guidance": "Se l'host è isolato e non ha connettività verso la rete di gestione o altri microservizi interni, l'SSRF è 'cieco' e non permette scansioni di porte o movimenti laterali.",
+          "options": [
+            { "label": "Egress Firewall Rigido (Blocco IP Privati e Loopback)", "posture": "Mitigante", "details": "L'applicazione non può contattare servizi interni o porte locali." },
+            { "label": "Nessun Filtro di Uscita verso la LAN/VPC", "posture": "Aggravante", "details": "Possibile port scanning della rete interna e contatto con microservizi non autenticati." }
+          ]
+        }
+      ]
+    },
+    "auth_session": {
+      "name": "Autenticazione, Sessioni & Brute Force",
+      "match_keywords": ["authentication", "broken authentication", "brute force", "credential stuffing", "session", "jwt", "cwe-287", "cwe-307"],
+      "description": "Problemi di gestione dell'identità, password guessing e robustezza dei token.",
+      "questions": [
+        {
+          "id": "auth_mfa_enforced",
+          "title": "Adozione dell'Autenticazione a Più Fattori (MFA)",
+          "question_to_ask": "L'accesso all'applicazione o al portale richiede obbligatoriamente un secondo fattore (MFA/OTP/WebAuthn)?",
+          "analyst_guidance": "Anche se una vulnerabilità consente il guessing delle password o se le credenziali sono state leakate, la presenza di un secondo fattore obbligatorio impedisce all'attaccante di finalizzare l'accesso.",
+          "options": [
+            { "label": "MFA Obbligatorio su Tutti gli Utenti", "posture": "Mitigante", "details": "Il furto o indovinare della sola password non permette il login." },
+            { "label": "MFA Facoltativo / Solo su Amministratori", "posture": "Neutro", "details": "Gli account standard rimangono vulnerabili a credential stuffing." },
+            { "label": "Nessun MFA (Solo Password Singola)", "posture": "Aggravante", "details": "Vulnerabile ad accessi diretti con credenziali deboli o compromesse." }
+          ]
+        },
+        {
+          "id": "auth_lockout_rate_limit",
+          "title": "Account Lockout & Rate Limiting Attivi",
+          "question_to_ask": "Esiste un blocco temporaneo dell'account (lockout) o un rate limiting (CAPTCHA / 5 tentativi per minuto) sui tentativi falliti?",
+          "analyst_guidance": "Se il pentester riporta 'Mancanza di blocco account', chiedi se c'è un rate limit applicativo o su WAF/API Gateway che rallenta o blocca l'attacco distribuito.",
+          "options": [
+            { "label": "Lockout & Rate Limiting Rigidi", "posture": "Mitigante", "details": "L'enumerazione e il brute force automatizzati vengono bloccati dopo pochi tentativi." },
+            { "label": "Solo Rallentamento / Nessun Blocco Effettivo", "posture": "Neutro", "details": "Attacchi lenti e distribuiti possono avere successo nel lungo periodo." },
+            { "label": "Nessun Controllo sui Tentativi Falliti", "posture": "Aggravante", "details": "Attaccabile con dizionari massivi a centinaia di richieste al secondo." }
+          ]
+        }
+      ]
+    },
+    "cloud_misconfig": {
+      "name": "Cloud Security Posture & Misconfigurations",
+      "match_keywords": ["s3", "bucket", "cloud", "iam", "security group", "blob", "azure", "aws", "oci"],
+      "description": "Errata configurazione di risorse o permessi cloud. L'impatto dipende dai controlli di accesso a monte e dalla cifratura.",
+      "questions": [
+        {
+          "id": "cloud_public_block",
+          "title": "Policy di Protezione a Livello Account (es. S3 Block Public Access)",
+          "question_to_ask": "A livello di account cloud generale (AWS Organization / Azure Policy), è attivo il blocco centralizzato degli accessi pubblici (es. S3 Block Public Access)?",
+          "analyst_guidance": "Spesso uno scanner segnala un bucket come 'misconfigured', ma una Service Control Policy (SCP) o il Block Public Access a livello account sovrascrive la policy locale impedendo qualsiasi accesso anonimo da Internet.",
+          "options": [
+            { "label": "SCP / Account-Level Block Public Access Attivo", "posture": "Mitigante", "details": "L'accesso pubblico è negato centralmente a monte, anche se il singolo bucket ha policy aperta." },
+            { "label": "Nessun Blocco Centralizzato", "posture": "Aggravante", "details": "Il bucket o la risorsa è effettivamente esposta al web senza barriere." }
+          ]
+        },
+        {
+          "id": "cloud_encryption",
+          "title": "Cifratura dei Dati Archiviati (KMS / Customer-Managed Key)",
+          "question_to_ask": "I dati archiviati sono cifrati con chiavi gestite dal cliente (KMS con rotazione e policy di accesso restrittive)?",
+          "analyst_guidance": "Anche in caso di download indebito dell'oggetto o volume disco, se la chiave KMS richiede autorizzazioni IAM specifiche, il payload è illeggibile.",
+          "options": [
+            { "label": "Cifratura KMS con Access Policy Dedicata", "posture": "Mitigante", "details": "Richiede sia il permesso sull'oggetto sia la decrypt permission sulla chiave KMS." },
+            { "label": "Cifratura Standard di Default del Provider", "posture": "Neutro", "details": "Protegge dal furto fisico dell'hardware ma trasparente agli accessi API." },
+            { "label": "Nessuna Cifratura", "posture": "Aggravante", "details": "Dati in chiaro leggibili direttamente." }
+          ]
+        }
+      ]
+    },
+    "generic": {
+      "name": "Verifica Tecnica Generale di Triage",
+      "match_keywords": [],
+      "description": "Guida tecnica per chiarire i vincoli di raggiungibilità e difendibilità con ingegneri e pentester.",
+      "questions": [
+        {
+          "id": "gen_reachability",
+          "title": "Raggiungibilità di Rete Effettiva",
+          "question_to_ask": "L'endpoint segnalato richiede una rotta di rete diretta o si trova dietro reverse proxy, API gateway o filtri perimetrali?",
+          "analyst_guidance": "Chiedere agli ingegneri l'esatto percorso di rete tra il client e il servizio vulnerabile per verificare se il payload del pentester passa inalterato o viene normalizzato.",
+          "options": [
+            { "label": "Dietro Reverse Proxy / Gateway con Normalizzazione", "posture": "Mitigante", "details": "I percorsi URL e payload anomali vengono normalizzati prima del backend." },
+            { "label": "Accesso Diretto all'Applicativo", "posture": "Neutro", "details": "Nessun layer intermedio di ispezione del traffico." }
+          ]
+        },
+        {
+          "id": "gen_logging_alerting",
+          "title": "Capacità di Rilevamento e Alerting dell'Anomalia",
+          "question_to_ask": "Se un attaccante invia payload malevoli contro questo endpoint, l'anomalia genera log strutturati e allerta il SOC/SIEM?",
+          "analyst_guidance": "Un exploit non contrastato in silenzio è molto più pericoloso di un tentativo che fa scattare un blocco IP o un allarme entro 5 minuti.",
+          "options": [
+            { "label": "Log Correlati nel SIEM con Alerting Real-time", "posture": "Mitigante", "details": "Tempo di rilevamento (MTTD) minimo: l'azione malevola viene interrotta sul nascere." },
+            { "label": "Log Standard su File Locale senza Allerta", "posture": "Neutro", "details": "Auditabile a posteriori solo in fase di analisi forense." },
+            { "label": "Nessun Log dei Tentativi Falliti", "posture": "Aggravante", "details": "L'attaccante può iterare tentativi indisturbato." }
+          ]
+        }
+      ]
+    }
+  }
+}

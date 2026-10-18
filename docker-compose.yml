@@ -1,0 +1,18 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./sn_vul_app_vul_entry_cleaned.json:/app/sn_vul_app_vul_entry_cleaned.json
+      - ./countermeasures.json:/app/countermeasures.json
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host

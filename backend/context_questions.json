@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "title": "Questionario di Contesto ed Esposizione Operativa",
+    "version": "1.0.0",
+    "purpose": "Valutazione strategica multidisciplinare per tavoli di lavoro tra Security ed Engineering al fine di determinare il Fattore di Esposizione/Rilevanza categorico (High, Medium, Low).",
+    "output_factor": "Fattore di Esposizione Aggregato (Exposure Factor)"
+  },
+  "scoring_system": {
+    "scale": {
+      "High": {
+        "score": 3,
+        "label": "Alto"
+      },
+      "Medium": {
+        "score": 2,
+        "label": "Medio"
+      },
+      "Low": {
+        "score": 1,
+        "label": "Basso"
+      }
+    },
+    "score_range": {
+      "min": 4,
+      "max": 12
+    },
+    "weighted_range": {
+      "min": 1.0,
+      "max": 3.0
+    },
+    "thresholds": {
+      "High": {
+        "level": "High",
+        "label": "Alto",
+        "min_total_score": 9,
+        "min_weighted_score": 2.3,
+        "description": "Esposizione critica: l'asset è direttamente accessibile, essenziale per il business o sotto attacco attivo, amplificando la priorità di remediation.",
+        "color": "#EF4444"
+      },
+      "Medium": {
+        "level": "Medium",
+        "label": "Medio",
+        "min_total_score": 6,
+        "max_total_score": 8,
+        "min_weighted_score": 1.6,
+        "max_weighted_score": 2.29,
+        "description": "Esposizione moderata: asset o dati con impatto aziendale controllato o con perimetro parzialmente protetto.",
+        "color": "#F59E0B"
+      },
+      "Low": {
+        "level": "Low",
+        "label": "Basso",
+        "max_total_score": 5,
+        "max_weighted_score": 1.59,
+        "description": "Esposizione minima: asset isolato, a ridotto impatto di business e senza evidenza di exploitability attiva.",
+        "color": "#10B981"
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "reachability_volume",
+      "title": "Bacino di Utenza ed Esposizione dell'Asset",
+      "weight": 0.3,
+      "rationale": "Quantifica l'ampiezza della superficie di contatto di rete e il volume di utenti/chiamanti potenziali in grado di raggiungere il componente.",
+      "operational_guidance": "Verificare se l'endpoint è protetto da filtri perimetrali (WAF/FW/VPN) o se è aperto a livello mondiale via DNS/BGP.",
+      "options": [
+        {
+          "value": "High",
+          "label": "Alto - Public Internet / Mass User Base",
+          "description": "Asset esposto direttamente su Internet pubblico o API aperta, raggiungibile da milioni di utenti esterni senza filtri di rete o con registrazione aperta al pubblico.",
+          "score": 3,
+          "technical_indicators": [
+            "IP pubblico diretto o FQDN con record A/CNAME su DNS pubblici",
+            "Nessuna autenticazione di rete perimetrale preventiva richiesta",
+            "Servizio consumer, portale web e-commerce, mobile API gateway aperto"
+          ]
+        },
+        {
+          "value": "Medium",
+          "label": "Medio - Rete Aziendale Estesa / Partner B2B",
+          "description": "Raggiungibile dall'intera Intranet aziendale (tutti i dipendenti e postazioni di lavoro) o da reti federate di terze parti / partner B2B con migliaia di utenti accreditati.",
+          "score": 2,
+          "technical_indicators": [
+            "LAN interna aziendale routata o subnet enterprise comune",
+            "Accesso condizionato a VPN client-to-site o concentratore remoto",
+            "Circuito MPLS / peering dedicato verso fornitori terzi certificati"
+          ]
+        },
+        {
+          "value": "Low",
+          "label": "Basso - Segmento Isolato / Accesso Riservato",
+          "description": "Asset segregato in DMZ interna, bastion host o subnet di backend non routata, accessibile unicamente da pochissimi operatori autorizzati o microservizi via whitelist rigida.",
+          "score": 1,
+          "technical_indicators": [
+            "Rete di gestione Out-Of-Band (OOB) o VLAN di storage dedicata",
+            "Accesso limitato a IP sorgente statici via ingress security group / iptables",
+            "Database cluster isolato dietro tier applicativo senza rotta diretta verso i client"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "asset_criticality",
+      "title": "Criticità del Componente e Impatto di Business",
+      "weight": 0.25,
+      "rationale": "Misura l'importanza strategica e l'impatto economico, operativo o legale per l'organizzazione in caso di interruzione o manomissione del servizio.",
+      "operational_guidance": "Consultare il BIA (Business Impact Analysis) o il catalogo CMDB per classificare il Tier dell'asset.",
+      "options": [
+        {
+          "value": "High",
+          "label": "Alto - Mission Critical / Tier 1",
+          "description": "Componente vitale per il core business o transazioni finanziarie. Un'interruzione o compromissione causa blocco immediato delle operation, sanzioni regolatorie severe o danno reputazionale irreparabile.",
+          "score": 3,
+          "technical_indicators": [
+            "RTO < 1h / RPO = 0 (alta disponibilità richiesta)",
+            "Piattaforma di pagamenti, core bancario/assicurativo, controllo industriale SCADA",
+            "Obblighi di notifica immediata alle autorità di vigilanza (NIS2, DORA, GDPR)"
+          ]
+        },
+        {
+          "value": "Medium",
+          "label": "Medio - Business Support / Tier 2",
+          "description": "Servizio di supporto alle attività operative aziendali. Un incidente causa inefficienze o ritardi lavorativi temporanei con tolleranza di ripristino di alcune ore (RTO intermedio).",
+          "score": 2,
+          "technical_indicators": [
+            "RTO tra 4h e 24h",
+            "CRM interno, portale di ticketing helpdesk, strumenti di collaboration aziendali",
+            "Impatto economico indiretto ma recuperabile senza blocco totale delle vendite"
+          ]
+        },
+        {
+          "value": "Low",
+          "label": "Basso - Ausiliario / Non Critico / Dev-Test",
+          "description": "Ambienti non produttivi (dev, stage, sandbox) o tool ausiliari la cui indisponibilità prolungata non produce perdite economiche né blocca le attività aziendali.",
+          "score": 1,
+          "technical_indicators": [
+            "RTO > 24h o best effort",
+            "Ambiente di collaudo o staging senza dati di produzione",
+            "Wiki interna di documentazione tecnica o laboratorio R&D prototipale"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "data_sensitivity",
+      "title": "Rilevanza e Classificazione dei Dati Trattati",
+      "weight": 0.25,
+      "rationale": "Quantifica la riservatezza delle informazioni gestite, memorizzate o transitate attraverso l'asset in base alla compliance e al danno da data breach.",
+      "operational_guidance": "Verificare le etichette di classificazione dati (es. DLP, GDPR Art. 9, PCI-DSS cardholder data environment).",
+      "options": [
+        {
+          "value": "High",
+          "label": "Alto - Dati Critici / Regolamentati (GDPR, PCI, Segreti)",
+          "description": "Gestione di dati ad alto impatto: PII sensibili su larga scala (art. 9 GDPR), dati di carte di credito (PCI-DSS), chiavi crittografiche master, segreti industriali o proprietà intellettuale core.",
+          "score": 3,
+          "technical_indicators": [
+            "Database titolari di carte di pagamento (PAN, CVV)",
+            "Dati biometrici, sanitari o giudiziari di utenti/clienti",
+            "Chiavi private TLS root, vault segreti aziendali, codice sorgente di proprietà core"
+          ]
+        },
+        {
+          "value": "Medium",
+          "label": "Medio - Dati Confidenziali Interni",
+          "description": "Informazioni riservate a uso esclusivamente interno dell'organizzazione (organigrammi, policy interne, corrispondenza commerciale standard, log applicativi non anonimizzati).",
+          "score": 2,
+          "technical_indicators": [
+            "Scambi email aziendali interni, note operative di progetto",
+            "Log di audit interno o metadati di sessione utente",
+            "Contratti standard e listini prezzi commerciali non pubblici"
+          ]
+        },
+        {
+          "value": "Low",
+          "label": "Basso - Dati Pubblici / Open Data",
+          "description": "Informazioni già pubbliche, cataloghi prodotti aperti, materiali promozionali o dati sintetici privi di valore strategico o regolamentare.",
+          "score": 1,
+          "technical_indicators": [
+            "Articoli di blog, documentazione tecnica open-source, cataloghi marketing",
+            "Dati di test fittizi interamente generati e privi di riferimenti reali",
+            "Informazioni di dominio pubblico liberamente consultabili"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "threat_intel_exploitability",
+      "title": "Evidenza di Exploitability e Threat Intelligence (in the wild / EPSS)",
+      "weight": 0.2,
+      "rationale": "Riflette l'effettiva minaccia corrente basata su dati di telemetria, tracciamento di campagne malevole attive e disponibilità di armamento affidabile.",
+      "operational_guidance": "Consultare il catalogo CISA KEV, First.org EPSS score e feed Threat Intel (Recorded Future, GreyNoise, Mandiant).",
+      "options": [
+        {
+          "value": "High",
+          "label": "Alto - Exploit Attivo in the Wild / Weaponized PoC / EPSS Alto",
+          "description": "Presenza accertata di exploit funzionante (Metasploit, C2 framework), inclusione nel catalogo CISA KEV (Known Exploited Vulnerabilities) o EPSS > 0.36 (>36% di probabilità di exploit entro 30 giorni).",
+          "score": 3,
+          "technical_indicators": [
+            "Incluso nel catalogo CISA KEV (Known Exploited Vulnerabilities)",
+            "Modulo exploit attivo integrato in Metasploit, Core Impact o Nuclei",
+            "EPSS score > 0.36 (alta probabilità statistica di sfruttamento)"
+          ]
+        },
+        {
+          "value": "Medium",
+          "label": "Medio - PoC Teorico / Exploit Non Automatizzato / EPSS Medio",
+          "description": "Proof of Concept pubblico o whitepaper di ricerca disponibile, ma che richiede adattamenti significativi, parametri non banali o catene complesse; EPSS compreso tra 0.05 e 0.36.",
+          "score": 2,
+          "technical_indicators": [
+            "Script dimostrativo / PoC grezzo su GitHub non weaponizzato per attacchi massivi",
+            "Richiede condizioni temporali o di configurazione molto specifiche",
+            "EPSS score tra 0.05 e 0.36 (probabilità moderata)"
+          ]
+        },
+        {
+          "value": "Low",
+          "label": "Basso - Nessun Exploit Noto / Puramente Teorico / EPSS Trascurabile",
+          "description": "Nessun codice di exploit reperibile, vulnerabilità riscontrata solo via analisi statica/audit del codice, richiedente condizioni al contorno estremamente rare; EPSS < 0.05 (<5%).",
+          "score": 1,
+          "technical_indicators": [
+            "Nessuna evidenza di exploit pubblico o campagne in the wild",
+            "Segnalazione puramente teorica da security advisory / static analysis",
+            "EPSS score < 0.05 (probabilità minima di sfruttamento nei successivi 30 giorni)"
+          ]
+        }
+      ]
+    }
+  ]
+}
